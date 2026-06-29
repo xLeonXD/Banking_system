@@ -52,7 +52,7 @@ class Account:
             self.counter += 1
             return
 
-    def __exit__(self):
+    def __exit__(self,exc_type, exc_value, traceback):
         self.login = False
         print("Logging out",end="")
         slow_print("...",timing1)
@@ -60,3 +60,6 @@ class Account:
 
 account_dict = load_accounts()
 list_accounts()
+
+with account_dict[6] as account:
+    pass
