@@ -22,6 +22,13 @@ def list_accounts():
     for i in account_dict:
         print(account_dict[i])
 
+def create_account(usr,pas):
+    sql.insert_data_accounts(usr,pas)
+    account_dict = load_accounts()
+
+    return account_dict
+
+
 class Account:
     def __init__(self,user_id,username,password):
         self.user_id  = user_id
@@ -29,9 +36,18 @@ class Account:
         self.password = password
         self.counter  = 0
         self.login    = False
+        self.money    = False
 
-    def __str__(self):
-        return f"{self.user_id} : {self.username}"
+    def update_money_balance(self):
+        pass
+
+    def update_stored_data_money(self):
+        money = sql.get_money(self.user_id)
+        self.money = money
+
+    def check_money(self):
+        money = sql.get_money(self.user_id)
+        print(f"Your balance : {money}")
 
     def __enter__(self):
         if self.counter > 3:
@@ -58,6 +74,8 @@ class Account:
         slow_print("...",timing1)
         return
 
+    def __str__(self):
+        return f"{self.user_id} : {self.username}"
 account_dict = load_accounts()
 list_accounts()
 
