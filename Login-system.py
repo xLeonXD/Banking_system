@@ -1,14 +1,16 @@
-#import sqlite3
 import sqlite_data as sql
+import time
 
-sql.insert_data_accounts("leon",1234)
+timing1 = 0.35
+
+def slow_print(text,timing):
+    for i in text:
+        time.sleep(timing)
+        print(i,end="")
+    else:
+        print("")
 
 def load_accounts():
-    """con = sqlite3.connect("accounts.db")
-    cursor = con.cursor()
-    cursor.execute("SELECT * FROM accounts")
-    """
-    #return sql.get_accounts()
     items = sql.get_accounts()
     account_dict = {}
     for user_id,username,password in items:
@@ -43,10 +45,18 @@ class Account:
             self.login = True
             self.counter = 0
             print("Login Successful")
+            return
         else:
             print("Login Failed.")
             print("Wrong username or password.")
             self.counter += 1
             return
-        
-#print(account_dict)
+
+    def __exit__(self):
+        self.login = False
+        print("Logging out",end="")
+        slow_print("...",timing1)
+        return
+
+account_dict = load_accounts()
+list_accounts()
