@@ -37,8 +37,17 @@ class Account:
         self.counter  = 0
         self.login    = False
         self.money    = False
-
+    
+    def login_check(self):
+        if self.login:
+            return True
+        else:
+            print("You are not logged in !!")
+            return False
+        
     def update_money_balance(self):
+        if not Account.login_check:
+            return            
         pass
 
     def update_stored_data_money(self):
@@ -46,13 +55,15 @@ class Account:
         self.money = money
 
     def check_money(self):
+        if not Account.login_check:
+            return
         money = sql.get_money(self.user_id)
         print(f"Your balance : {money}")
 
     def __enter__(self):
         if self.counter > 3:
             print("You have ran out of tries.")
-            return
+            return self
 
         print(" Enter username and password.")
         iuser     = input("Username : ")
@@ -61,18 +72,18 @@ class Account:
             self.login = True
             self.counter = 0
             print("Login Successful")
-            return
+            return self
         else:
             print("Login Failed.")
             print("Wrong username or password.")
             self.counter += 1
-            return
+            return self
 
     def __exit__(self,exc_type, exc_value, traceback):
         self.login = False
         print("Logging out",end="")
         slow_print("...",timing1)
-        return
+        return self
 
     def __str__(self):
         return f"{self.user_id} : {self.username}"
