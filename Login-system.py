@@ -37,17 +37,22 @@ class Account:
         self.counter  = 0
         self.login    = False
         self.money    = False
-    
+
     def login_check(self):
         if self.login:
             return True
         else:
             print("You are not logged in !!")
             return False
-        
+
+    def pay(self,other,pay_amount):
+        if not self.login_check():
+            return
+        sql.pay_transaction(self.user_id,other.user_id,pay_amount,self.username,other.username)
+
     def update_money_balance(self):
-        if not Account.login_check:
-            return            
+        if not self.login_check():
+            return
         pass
 
     def update_stored_data_money(self):
@@ -55,7 +60,7 @@ class Account:
         self.money = money
 
     def check_money(self):
-        if not Account.login_check:
+        if not self.login_check():
             return
         money = sql.get_money(self.user_id)
         print(f"Your balance : {money}")
