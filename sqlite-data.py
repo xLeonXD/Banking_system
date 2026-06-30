@@ -30,7 +30,36 @@ def get_money(user_id):
     cursor = con.cursor()
     cursor.execute("SELECT money FROM accounts WHERE user_id = ? ",[user_id])
     money = cursor.fetchone()
+    con.close()
     return money
+
+def change_money(user_id,money):
+    import sqlite3
+    con = sqlite3.connect("accounts.db")
+    cursor = con.cursor()
+    cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?",[money,user_id])
+    con.close()
+
+def pay_transaction(user_id1,user_id2,pay_amount):
+    import sqlite3
+    con = sqlite3.connect("accounts.db")
+    cursor = con.cursor()
+
+    money_1 = get_money(user_id1)
+    money_1 = money_1 - pay_amount
+    money_2 = get_money(user_id2)
+    money_2 = money_2 + pay_amount
+    try:
+        change_money(user_id1,money_1)
+        change_money(user_id2,money_2)
+        con.commit()
+        con.close()
+    except:
+        con.rollback()
+        con.close()
+
+def create_transaction_table():
+    pass
 
 def create_table_accounts():
     import sqlite3
