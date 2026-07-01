@@ -37,6 +37,8 @@ class Account:
         self.counter  = 0
         self.login    = False
         self.money    = False
+        #self.pay_amount = False
+
 
     def login_check(self):
         if self.login:
@@ -50,11 +52,19 @@ class Account:
             return True
         else:
             return False
-    
+
     def pay(self,other,pay_amount):
         if not self.login_check():
             return
         sql.pay_transaction(self.user_id,other.user_id,pay_amount,self.username,other.username)
+
+    def payment_process(self,other,pay_amount):
+        self.update_stored_data_money()
+        if not self.check_payment(pay_amount):
+            print("Not enough money !!")
+            return self
+        self.pay(other,pay_amount)
+        return self
 
     def update_money_balance(self):
         if not self.login_check():
@@ -64,7 +74,7 @@ class Account:
     def update_stored_data_money(self):
         money = sql.get_money(self.user_id)
         self.money = money
-
+        return self
     def check_money(self):
         if not self.login_check():
             return
@@ -98,6 +108,7 @@ class Account:
 
     def __str__(self):
         return f"{self.user_id} : {self.username}"
+
 account_dict = load_accounts()
 list_accounts()
 
