@@ -1,5 +1,7 @@
+import sqlite3
+
 def insert_data_accounts(usr,pas):
-    import sqlite3
+    #import sqlite3
     #con = sqlite3.connect("accounts.db")
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
@@ -13,7 +15,7 @@ def insert_data_accounts(usr,pas):
             #con.close()
 
 def insert_data_transaction(user_id,username,user_id2,username2,money,money_spent):
-    import sqlite3
+    #import sqlite3
     #con = sqlite3.connect("accounts.db")
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
@@ -27,7 +29,7 @@ def insert_data_transaction(user_id,username,user_id2,username2,money,money_spen
 
 
 def delete_data_accounts(user_id):
-    import sqlite3
+    #import sqlite3
     #con = sqlite3.connect("accounts.db")
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
@@ -41,7 +43,7 @@ def delete_data_accounts(user_id):
             #con.close()
 
 def get_money(user_id):
-    import sqlite3
+    #import sqlite3
     #con = sqlite3.connect("accounts.db")
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
@@ -52,7 +54,7 @@ def get_money(user_id):
         return money
 
 def change_money(user_id,money):
-    import sqlite3
+    #import sqlite3
     #con = sqlite3.connect("accounts.db")
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
@@ -66,7 +68,7 @@ def change_money(user_id,money):
             #con.close()
 
 def pay_transaction(user_id1,user_id2,pay_amount,username1,username2):
-    import sqlite3
+    #import sqlite3
     #con = sqlite3.connect("accounts.db")
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
@@ -98,7 +100,7 @@ def pay_transaction(user_id1,user_id2,pay_amount,username1,username2):
             #con.close()
 
 def create_transaction_table():
-    import sqlite3
+    #import sqlite3
     #con = sqlite3.connect("accounts.db")
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
@@ -114,7 +116,7 @@ def create_transaction_table():
         #con.close()
 
 def create_table_accounts():
-    import sqlite3
+    #import sqlite3
     #con = sqlite3.connect("accounts.db")
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
@@ -130,7 +132,7 @@ def create_table_accounts():
 #import_data_accounts("leoner11",1234)
 #delete_data_accounts(1)
 def display():
-    import sqlite3
+    #import sqlite3
     #con = sqlite3.connect("accounts.db")
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
@@ -142,7 +144,7 @@ def display():
         #con.close()
 
 def get_accounts():
-    import sqlite3
+    #import sqlite3
     #con = sqlite3.connect("accounts.db")
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
