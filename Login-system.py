@@ -45,6 +45,12 @@ class Account:
             print("You are not logged in !!")
             return False
 
+    def check_payment(self,pay_amount):
+        if pay_amount <= self.money:
+            return True
+        else:
+            return False
+    
     def pay(self,other,pay_amount):
         if not self.login_check():
             return
