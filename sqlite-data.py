@@ -1,146 +1,157 @@
 def insert_data_accounts(usr,pas):
     import sqlite3
-    con = sqlite3.connect("accounts.db")
-    cursor = con.cursor()
-    try:
-        cursor.execute("INSERT INTO accounts (username,password,money) VALUES (?,?,0)",[usr,pas])
-        con.commit()
-        con.close()
-    except:
-        con.rollback()
-        print("Something happened, rolling back!!")
-        con.close()
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        try:
+            cursor.execute("INSERT INTO accounts (username,password,money) VALUES (?,?,0)",[usr,pas])
+            con.commit()
+            #con.close()
+        except:
+            con.rollback()
+            print("Something happened, rolling back!!")
+            #con.close()
 
 def insert_data_transaction(user_id,username,user_id2,username2,money,money_spent):
     import sqlite3
-    con = sqlite3.connect("accounts.db")
-    cursor = con.cursor()
-    try:
-        cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id,username,user_id2,username2,money,money_spent])
-        con.commit()
-        con.close()
-    except:
-        con.rollback()
-        con.close()
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        try:
+            cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id,username,user_id2,username2,money,money_spent])
+            con.commit()
+            #con.close()
+        except:
+            con.rollback()
+            #con.close()
 
 
 def delete_data_accounts(user_id):
     import sqlite3
-    con = sqlite3.connect("accounts.db")
-    cursor = con.cursor()
-    try:
-        cursor.execute("DELETE FROM accounts WHERE user_id = ?",[user_id])
-        con.commit()
-        con.close()
-    except:
-        con.rollback()
-        print("Something happened, rolling back!!")
-        con.close()
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        try:
+            cursor.execute("DELETE FROM accounts WHERE user_id = ?",[user_id])
+            con.commit()
+            #con.close()
+        except:
+            con.rollback()
+            print("Something happened, rolling back!!")
+            #con.close()
 
 def get_money(user_id):
     import sqlite3
-    con = sqlite3.connect("accounts.db")
-    cursor = con.cursor()
-    cursor.execute("SELECT money FROM accounts WHERE user_id = ? ",[user_id])
-    money_tuple = cursor.fetchone()
-    money = money_tuple[0]
-    con.close()
-    return money
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("SELECT money FROM accounts WHERE user_id = ? ",[user_id])
+        money_tuple = cursor.fetchone()
+        money = money_tuple[0]
+        #con.close()
+        return money
 
 def change_money(user_id,money):
     import sqlite3
-    con = sqlite3.connect("accounts.db")
-    cursor = con.cursor()
-    try:
-        cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?",[money,user_id])
-        con.commit()
-        con.close()
-    except:
-        print("Transaction failed !!")
-        con.rollback()
-        con.close()
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        try:
+            cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?",[money,user_id])
+            con.commit()
+            #con.close()
+        except:
+            print("Transaction failed !!")
+            con.rollback()
+            #con.close()
 
 def pay_transaction(user_id1,user_id2,pay_amount,username1,username2):
     import sqlite3
-    con = sqlite3.connect("accounts.db")
-    cursor = con.cursor()
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
 
-    money_1 = get_money(user_id1)
-    money_1 = money_1 - pay_amount
-    money_2 = get_money(user_id2)
-    money_2 = money_2 + pay_amount
-    """try:
-        change_money(user_id1,money_1)
-        change_money(user_id2,money_2)
-        con.commit()
-        con.close()
-    except:
-        con.rollback()
-        con.close()"""
+        money_1 = get_money(user_id1)
+        money_1 = money_1 - pay_amount
+        money_2 = get_money(user_id2)
+        money_2 = money_2 + pay_amount
+        """try:
+            change_money(user_id1,money_1)
+            change_money(user_id2,money_2)
+            con.commit()
+            con.close()
+        except:
+            con.rollback()
+            con.close()"""
 
-    try:
-        cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?", [money_1, user_id1])
-        cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?", [money_2, user_id2])
-        cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id1, username1, user_id2, username2, money_1, -pay_amount])
-        cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id2, username2, user_id2, username2, money_2, +pay_amount])
-        con.commit()
-        con.close()
+        try:
+            cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?", [money_1, user_id1])
+            cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?", [money_2, user_id2])
+            cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id1, username1, user_id2, username2, money_1, -pay_amount])
+            cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id2, username2, user_id1, username1, money_2, +pay_amount])
+            con.commit()
+            #con.close()
 
-    except:
-        print("Transaction failed !!")
-        con.rollback()
-        con.close()
+        except:
+            print("Transaction failed !!")
+            con.rollback()
+            #con.close()
 
 def create_transaction_table():
     import sqlite3
-    con = sqlite3.connect("accounts.db")
-    cursor = con.cursor()
-    cursor.execute("""CREATE TABLE IF NOT EXISTS transactions( 
-                    user_id     INT NOT NULL,
-                    username    TEXT NOT NULL,           
-                    user_id2    INT NOT NULL,
-                    username2   TEXT NOT NULL,
-                    money       INT NOT NULL,
-                    money_spent INT NOT NULL)
-    """)
-    con.commit()
-    con.close()
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("""CREATE TABLE IF NOT EXISTS transactions( 
+                        user_id     INT NOT NULL,
+                        username    TEXT NOT NULL,           
+                        user_id2    INT NOT NULL,
+                        username2   TEXT NOT NULL,
+                        money       INT NOT NULL,
+                        money_spent INT NOT NULL)
+        """)
+        con.commit()
+        #con.close()
 
 def create_table_accounts():
     import sqlite3
-    con = sqlite3.connect("accounts.db")
-    cursor = con.cursor()
-    cursor.execute("""CREATE TABLE accounts(
-                   user_id  INTEGER PRIMARY KEY AUTOINCREMENT,
-                   username TEXT NOT NULL UNIQUE,
-                   password TEXT NOT NULL,
-                   money    INT NOT NULL
-                   )""")
-    con.commit()
-    con.close()
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("""CREATE TABLE IF NOT EXISTS accounts(
+                       user_id  INTEGER PRIMARY KEY AUTOINCREMENT,
+                       username TEXT NOT NULL UNIQUE,
+                       password TEXT NOT NULL,
+                       money    INT NOT NULL
+                       )""")
+        con.commit()
+        #con.close()
 
 #import_data_accounts("leoner11",1234)
 #delete_data_accounts(1)
 def display():
     import sqlite3
-    con = sqlite3.connect("accounts.db")
-    cursor = con.cursor()
-    cursor.execute("SELECT * FROM accounts")
-    items = cursor.fetchall()
-    for i in items:
-        print(i)
-        #print("a")
-    con.close()
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("SELECT * FROM accounts")
+        items = cursor.fetchall()
+        for i in items:
+            print(i)
+            #print("a")
+        #con.close()
 
 def get_accounts():
     import sqlite3
-    con = sqlite3.connect("accounts.db")
-    cursor = con.cursor()
-    cursor.execute("SELECT * FROM accounts")
-    items = cursor.fetchall()
-    con.close()
-    return items
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("SELECT * FROM accounts")
+        items = cursor.fetchall()
+        #con.close()
+        return items
 
 
 #insert_data_accounts("leon2","1234")
 #display()
+
