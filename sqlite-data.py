@@ -73,10 +73,16 @@ def pay_transaction(user_id1,user_id2,pay_amount,username1,username2):
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
 
-        money_1 = get_money(user_id1)
+        """money_1 = get_money(user_id1)
         money_1 = money_1 - pay_amount
         money_2 = get_money(user_id2)
-        money_2 = money_2 + pay_amount
+        money_2 = money_2 + pay_amount"""
+
+        cursor.execute("SELECT money FROM accounts WHERE user_id = ?", [user_id1])
+        money_1 = cursor.fetchone()[0]
+        cursor.execute("SELECT money FROM accounts WHERE user_id = ?", [user_id2])
+        money_2 = cursor.fetchone()[0]
+        
         """try:
             change_money(user_id1,money_1)
             change_money(user_id2,money_2)
