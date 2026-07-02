@@ -36,12 +36,16 @@ class Account:
         self.password = password
         self.counter  = 0
         self.login    = False
+        self.locked   = False
         self.money    = False
         #self.pay_amount = False
 
 
     def login_check(self):
-        if self.login:
+        if self.locked:
+            print("This account is locked.")
+            return False
+        elif self.login:
             return True
         else:
             print("You are not logged in !!")
@@ -82,8 +86,13 @@ class Account:
         print(f"Your balance : {money}")
 
     def __enter__(self):
-        if self.counter > 3:
+        if self.locked:
+            pass
+            #return
+        if self.counter >= 3:
+            self.locked = True
             print("You have ran out of tries.")
+            print("Your account is now locked.")
             return self
 
         print(" Enter username and password.")
@@ -109,8 +118,15 @@ class Account:
     def __str__(self):
         return f"{self.user_id} : {self.username}"
 
+#sql.delete_data_accounts(5)
+#sql.delete_data_accounts(6)
+sql.create_table_accounts()
+sql.create_transaction_table()
+sql.insert_data_accounts("leon",1234)
 account_dict = load_accounts()
 list_accounts()
+sql.display()
 
-with account_dict[6] as account:
+
+with account_dict[1] as account:
     pass
