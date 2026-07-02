@@ -86,7 +86,10 @@ def pay_transaction(user_id1,user_id2,pay_amount,username1,username2):
         money_1 = cursor.fetchone()[0]
         cursor.execute("SELECT money FROM accounts WHERE user_id = ?", [user_id2])
         money_2 = cursor.fetchone()[0]
-        
+
+        new_money_1 = money_1 - pay_amount
+        new_money_2 = money_2 + pay_amount
+
         """try:
             change_money(user_id1,money_1)
             change_money(user_id2,money_2)
@@ -97,10 +100,10 @@ def pay_transaction(user_id1,user_id2,pay_amount,username1,username2):
             con.close()"""
 
         try:
-            cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?", [money_1, user_id1])
-            cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?", [money_2, user_id2])
-            cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id1, username1, user_id2, username2, money_1, -pay_amount])
-            cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id2, username2, user_id1, username1, money_2, +pay_amount])
+            cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?", [new_money_1, user_id1])
+            cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?", [new_money_2, user_id2])
+            cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id1, username1, user_id2, username2, new_money_1, -pay_amount])
+            cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id2, username2, user_id1, username1, new_money_2, +pay_amount])
             con.commit()
             #con.close()
 
@@ -121,7 +124,8 @@ def create_transaction_table():
                         user_id2    INT NOT NULL,
                         username2   TEXT NOT NULL,
                         money       INT NOT NULL,
-                        money_spent INT NOT NULL)
+                        money_spent INT NOT NULL,
+                        transaction_date TEXT DEFAULT CURRENT_TIMESTAMP)
         """)
         con.commit()
         #con.close()
@@ -135,7 +139,8 @@ def create_table_accounts():
                        user_id  INTEGER PRIMARY KEY AUTOINCREMENT,
                        username TEXT NOT NULL UNIQUE,
                        password TEXT NOT NULL,
-                       money    INT NOT NULL
+                       money    INT NOT NULL,
+                       account_created_time TEXT DEFAULT CURRENT_TIMESTAMP
                        )""")
         con.commit()
         #con.close()
@@ -164,6 +169,12 @@ def get_accounts():
         #con.close()
         return items
 
+def get_transactions(user_id,amount=10):
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("SELECT * FROM transactions WHERE user_id = ? ORDER BY transaction_date DESC",[user_id])
+        transaction_tuple = cursor.fetchmany(amount)
+        return transaction_tuple
 
 #insert_data_accounts("leon2","1234")
 #display()
