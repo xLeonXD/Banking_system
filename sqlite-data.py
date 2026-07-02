@@ -9,7 +9,8 @@ def insert_data_accounts(usr,pas):
             cursor.execute("INSERT INTO accounts (username,password,money) VALUES (?,?,0)",[usr,pas])
             con.commit()
             #con.close()
-        except:
+        except Exception as error:
+            print(f"Error : {error}")
             con.rollback()
             print("Something happened, rolling back!!")
             #con.close()
@@ -23,7 +24,8 @@ def insert_data_transaction(user_id,username,user_id2,username2,money,money_spen
             cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id,username,user_id2,username2,money,money_spent])
             con.commit()
             #con.close()
-        except:
+        except Exception as error:
+            print(f"Error : {error}")
             con.rollback()
             #con.close()
 
@@ -37,7 +39,8 @@ def delete_data_accounts(user_id):
             cursor.execute("DELETE FROM accounts WHERE user_id = ?",[user_id])
             con.commit()
             #con.close()
-        except:
+        except Exception as error:
+            print(f"Error : {error}")
             con.rollback()
             print("Something happened, rolling back!!")
             #con.close()
@@ -62,7 +65,8 @@ def change_money(user_id,money):
             cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?",[money,user_id])
             con.commit()
             #con.close()
-        except:
+        except Exception as error:
+            print(f"Error : {error}")
             print("Transaction failed !!")
             con.rollback()
             #con.close()
@@ -100,7 +104,8 @@ def pay_transaction(user_id1,user_id2,pay_amount,username1,username2):
             con.commit()
             #con.close()
 
-        except:
+        except Exception as error:
+            print(f"Error : {error}")
             print("Transaction failed !!")
             con.rollback()
             #con.close()
