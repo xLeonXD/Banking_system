@@ -13,7 +13,7 @@ def slow_print(text,timing):
 def load_accounts():
     items = sql.get_accounts()
     account_dict = {}
-    for user_id,username,password in items:
+    for user_id,username,password,temp,temp2 in items:
         account_dict[user_id] = Account(user_id,username,password)
     return account_dict
 
