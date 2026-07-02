@@ -71,6 +71,17 @@ def change_money(user_id,money):
             con.rollback()
             #con.close()
 
+def change_lock_state(user_id,state):
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        try:
+            cursor.execute("UPDATE accounts SET lock_state = ? WHERE user_id = ?",[state,user_id])
+            con.commit()
+        except Exception as error:
+            print(f"Error : {error}")
+            print("Acount lock state management failure")
+            con.rollback()
+
 def pay_transaction(user_id1,user_id2,pay_amount,username1,username2):
     #import sqlite3
     #con = sqlite3.connect("accounts.db")
@@ -125,8 +136,8 @@ def create_transaction_table():
                         username2   TEXT NOT NULL,
                         money       INT NOT NULL,
                         money_spent INT NOT NULL,
-                        transaction_date TEXT DEFAULT CURRENT_TIMESTAMP)
-        """)
+                        transaction_date TEXT DEFAULT CURRENT_TIMESTAMP,
+                        )""")
         con.commit()
         #con.close()
 
@@ -140,7 +151,8 @@ def create_table_accounts():
                        username TEXT NOT NULL UNIQUE,
                        password TEXT NOT NULL,
                        money    INT NOT NULL,
-                       account_created_time TEXT DEFAULT CURRENT_TIMESTAMP
+                       account_created_time TEXT DEFAULT CURRENT_TIMESTAMP,
+                       lock_state BOOL DEFAULT FALSE
                        )""")
         con.commit()
         #con.close()
