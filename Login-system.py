@@ -13,8 +13,8 @@ def slow_print(text,timing):
 def load_accounts():
     items = sql.get_accounts()
     account_dict = {}
-    for user_id,username,password,temp,temp2 in items:
-        account_dict[user_id] = Account(user_id,username,password)
+    for user_id,username,password,temp,temp2,lock_state in items:
+        account_dict[user_id] = Account(user_id,username,password,lock_state)
     return account_dict
 
 def list_accounts():
@@ -30,13 +30,13 @@ def create_account(usr,pas):
 
 
 class Account:
-    def __init__(self,user_id,username,password):
+    def __init__(self,user_id,username,password,lock_state):
         self.user_id  = user_id
         self.username = username
         self.password = password
         self.counter  = 0
         self.login    = False
-        self.locked   = False
+        self.locked   = lock_state
         self.money    = False
         #self.pay_amount = False
 
@@ -70,20 +70,60 @@ class Account:
         self.pay(other,pay_amount)
         return self
 
-    def update_money_balance(self):
+    """def update_money_balance(self):
         if not self.login_check():
             return
-        pass
+        pass"""
 
     def update_stored_data_money(self):
         money = sql.get_money(self.user_id)
         self.money = money
         return self
+
     def check_money(self):
         if not self.login_check():
             return
         money = sql.get_money(self.user_id)
         print(f"Your balance : {money}")
+
+    def deposit_withdraw(self):
+        self.login_check()
+        print("What do you wanna do ? Withdraw / Deposit ")
+        choice = input("W/D : ")
+        choice = choice.lower()
+        if choice == "w" or choice == "withdraw":
+            amount_type = -1
+            choice = "withdraw"
+        elif choice == "d" or choice == "deposit":
+            amount_type = 1
+            choice = "deposit"
+        else:
+            print("Invalid choice.")
+            return
+        print(f"How much money to {choice}? ")
+        money_amount = input(" $ : ")
+        try:
+            money_amount = int(money_amount)
+        except Exception as error:
+            print(f"Error : {error}")
+            print("Money amount was not a number")
+            return
+        if money_amount <= 0:
+            if money_amount == 0:
+                print("Money amount is 0$ ")
+                return
+            elif money_amount < 0:
+                print("Money amount can't be negative")
+                return
+        if choice == "withdraw":
+            self.update_stored_data_money()
+            if not self.check_payment(money_amount):
+                print("Not enough money.")
+                return
+        money_amount *= amount_type
+        sql.change_money(self.user_id,money_amount)
+        self.update_stored_data_money()
+        return self
 
     def __enter__(self):
         if self.locked:
