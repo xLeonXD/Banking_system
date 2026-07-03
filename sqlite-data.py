@@ -1,172 +1,197 @@
-import sqlite_data as sql
-import time
+import sqlite3
 
-timing1 = 0.35
-
-def slow_print(text,timing):
-    for i in text:
-        time.sleep(timing)
-        print(i,end="")
-    else:
-        print("")
-
-def load_accounts():
-    items = sql.get_accounts()
-    account_dict = {}
-    for user_id,username,password,temp,temp2,lock_state in items:
-        account_dict[user_id] = Account(user_id,username,password,lock_state)
-    return account_dict
-
-def list_accounts():
-    account_dict = load_accounts()
-    for i in account_dict:
-        print(account_dict[i])
-
-def create_account(usr,pas):
-    sql.insert_data_accounts(usr,pas)
-    account_dict = load_accounts()
-
-    return account_dict
-
-
-class Account:
-    def __init__(self,user_id,username,password,lock_state):
-        self.user_id  = user_id
-        self.username = username
-        self.password = password
-        self.counter  = 0
-        self.login    = False
-        self.locked   = lock_state
-        self.money    = False
-        #self.pay_amount = False
-
-
-    def login_check(self):
-        if self.locked:
-            print("This account is locked.")
-            return False
-        elif self.login:
-            return True
-        else:
-            print("You are not logged in !!")
-            return False
-
-    def check_payment(self,pay_amount):
-        if pay_amount <= self.money:
-            return True
-        else:
-            return False
-
-    def pay(self,other,pay_amount):
-        if not self.login_check():
-            return
-        sql.pay_transaction(self.user_id,other.user_id,pay_amount,self.username,other.username)
-
-    def payment_process(self,other,pay_amount):
-        self.update_stored_data_money()
-        if not self.check_payment(pay_amount):
-            print("Not enough money !!")
-            return self
-        self.pay(other,pay_amount)
-        return self
-
-    """def update_money_balance(self):
-        if not self.login_check():
-            return
-        pass"""
-
-    def update_stored_data_money(self):
-        money = sql.get_money(self.user_id)
-        self.money = money
-        return self
-
-    def check_money(self):
-        if not self.login_check():
-            return
-        money = sql.get_money(self.user_id)
-        print(f"Your balance : {money}")
-
-    def deposit_withdraw(self):
-        self.login_check()
-        print("What do you wanna do ? Withdraw / Deposit ")
-        choice = input("W/D : ")
-        choice = choice.lower()
-        if choice == "w" or choice == "withdraw":
-            amount_type = -1
-            choice = "withdraw"
-        elif choice == "d" or choice == "deposit":
-            amount_type = 1
-            choice = "deposit"
-        else:
-            print("Invalid choice.")
-            return
-        print(f"How much money to {choice}? ")
-        money_amount = input(" $ : ")
+def insert_data_accounts(usr,pas):
+    #import sqlite3
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
         try:
-            money_amount = int(money_amount)
+            cursor.execute("INSERT INTO accounts (username,password,money) VALUES (?,?,0)",[usr,pas])
+            con.commit()
+            #con.close()
         except Exception as error:
             print(f"Error : {error}")
-            print("Money amount was not a number")
-            return
-        if money_amount <= 0:
-            if money_amount == 0:
-                print("Money amount is 0$ ")
-                return
-            elif money_amount < 0:
-                print("Money amount can't be negative")
-                return
-        if choice == "withdraw":
-            self.update_stored_data_money()
-            if not self.check_payment(money_amount):
-                print("Not enough money.")
-                return
-        money_amount *= amount_type
-        sql.change_money(self.user_id,money_amount)
-        self.update_stored_data_money()
-        return self
+            con.rollback()
+            print("Something happened, rolling back!!")
+            #con.close()
 
-    def __enter__(self):
-        if self.locked:
-            pass
-            #return
-        if self.counter >= 3:
-            self.locked = True
-            print("You have ran out of tries.")
-            print("Your account is now locked.")
-            return self
-
-        print(" Enter username and password.")
-        iuser     = input("Username : ")
-        ipassword = input("Password : ")
-        if iuser == self.username and ipassword == self.password:
-            self.login = True
-            self.counter = 0
-            print("Login Successful")
-            return self
-        else:
-            print("Login Failed.")
-            print("Wrong username or password.")
-            self.counter += 1
-            return self
-
-    def __exit__(self,exc_type, exc_value, traceback):
-        self.login = False
-        print("Logging out",end="")
-        slow_print("...",timing1)
-        return self
-
-    def __str__(self):
-        return f"{self.user_id} : {self.username}"
-
-#sql.delete_data_accounts(5)
-#sql.delete_data_accounts(6)
-sql.create_table_accounts()
-sql.create_transaction_table()
-sql.insert_data_accounts("leon",1234)
-account_dict = load_accounts()
-list_accounts()
-sql.display()
+def insert_data_transaction(user_id,username,user_id2,username2,money,money_spent):
+    #import sqlite3
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        try:
+            cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id,username,user_id2,username2,money,money_spent])
+            con.commit()
+            #con.close()
+        except Exception as error:
+            print(f"Error : {error}")
+            con.rollback()
+            #con.close()
 
 
-with account_dict[1] as account:
-    pass
+def delete_data_accounts(user_id):
+    #import sqlite3
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        try:
+            cursor.execute("DELETE FROM accounts WHERE user_id = ?",[user_id])
+            con.commit()
+            #con.close()
+        except Exception as error:
+            print(f"Error : {error}")
+            con.rollback()
+            print("Something happened, rolling back!!")
+            #con.close()
+
+def get_money(user_id):
+    #import sqlite3
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("SELECT money FROM accounts WHERE user_id = ? ",[user_id])
+        money_tuple = cursor.fetchone()
+        money = money_tuple[0]
+        #con.close()
+        return money
+
+def change_money(user_id,exchange_money):
+    #import sqlite3
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("SELECT money FROM accounts WHERE user_id = ?",[user_id])
+        money_tuple = cursor.fetchone()
+        money = money_tuple[0]
+        new_money = money + exchange_money
+        try:
+            cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?",[new_money,user_id])
+            con.commit()
+            #con.close()
+        except Exception as error:
+            print(f"Error : {error}")
+            print("Deposit/Withdraw failed !!")
+            con.rollback()
+            #con.close()
+
+def change_lock_state(user_id,state):
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        try:
+            cursor.execute("UPDATE accounts SET lock_state = ? WHERE user_id = ?",[state,user_id])
+            con.commit()
+        except Exception as error:
+            print(f"Error : {error}")
+            print("Acount lock state management failure")
+            con.rollback()
+
+def pay_transaction(user_id1,user_id2,pay_amount,username1,username2):
+    #import sqlite3
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+
+        """money_1 = get_money(user_id1)
+        money_1 = money_1 - pay_amount
+        money_2 = get_money(user_id2)
+        money_2 = money_2 + pay_amount"""
+
+        cursor.execute("SELECT money FROM accounts WHERE user_id = ?", [user_id1])
+        money_1 = cursor.fetchone()[0]
+        cursor.execute("SELECT money FROM accounts WHERE user_id = ?", [user_id2])
+        money_2 = cursor.fetchone()[0]
+
+        new_money_1 = money_1 - pay_amount
+        new_money_2 = money_2 + pay_amount
+
+        """try:
+            change_money(user_id1,money_1)
+            change_money(user_id2,money_2)
+            con.commit()
+            con.close()
+        except:
+            con.rollback()
+            con.close()"""
+
+        try:
+            cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?", [new_money_1, user_id1])
+            cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?", [new_money_2, user_id2])
+            cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id1, username1, user_id2, username2, new_money_1, -pay_amount])
+            cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id2, username2, user_id1, username1, new_money_2, +pay_amount])
+            con.commit()
+            #con.close()
+
+        except Exception as error:
+            print(f"Error : {error}")
+            print("Transaction failed !!")
+            con.rollback()
+            #con.close()
+
+def create_transaction_table():
+    #import sqlite3
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("""CREATE TABLE IF NOT EXISTS transactions( 
+                        user_id     INT NOT NULL,
+                        username    TEXT NOT NULL,           
+                        user_id2    INT NOT NULL,
+                        username2   TEXT NOT NULL,
+                        money       INT NOT NULL,
+                        money_spent INT NOT NULL,
+                        transaction_date TEXT DEFAULT CURRENT_TIMESTAMP,
+                        )""")
+        con.commit()
+        #con.close()
+
+def create_table_accounts():
+    #import sqlite3
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("""CREATE TABLE IF NOT EXISTS accounts(
+                       user_id  INTEGER PRIMARY KEY AUTOINCREMENT,
+                       username TEXT NOT NULL UNIQUE,
+                       password TEXT NOT NULL,
+                       money    INT NOT NULL,
+                       account_created_time TEXT DEFAULT CURRENT_TIMESTAMP,
+                       lock_state BOOL DEFAULT FALSE
+                       )""")
+        con.commit()
+        #con.close()
+
+#import_data_accounts("leoner11",1234)
+#delete_data_accounts(1)
+def display():
+    #import sqlite3
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("SELECT * FROM accounts")
+        items = cursor.fetchall()
+        for i in items:
+            print(i)
+            #print("a")
+        #con.close()
+
+def get_accounts():
+    #import sqlite3
+    #con = sqlite3.connect("accounts.db")
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("SELECT * FROM accounts")
+        items = cursor.fetchall()
+        #con.close()
+        return items
+
+def get_transactions(user_id,amount=10):
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("SELECT * FROM transactions WHERE user_id = ? ORDER BY transaction_date DESC",[user_id])
+        transaction_tuple = cursor.fetchmany(amount)
+        return transaction_tuple
+
+#insert_data_accounts("leon2","1234")
+#display()
+
