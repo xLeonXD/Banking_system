@@ -117,11 +117,24 @@ def pay_transaction(user_id1,user_id2,pay_amount,username1,username2):
         try:
             cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?", [new_money_1, user_id1])
             cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?", [new_money_2, user_id2])
-            cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id1, username1, user_id2, username2, new_money_1, -pay_amount])
-            cursor.execute("INSERT INTO transactions VALUES (?,?,?,?,?,?)",[user_id2, username2, user_id1, username1, new_money_2, +pay_amount])
+            cursor.execute("""INSERT INTO transactions ( user_id,
+                                                            username,
+                                                            user_id2,
+                                                            username2,
+                                                            money,
+                                                            money_spent)
+                                                            VALUES (?,?,?,?,?,?)""",
+                            [user_id1, username1, user_id2, username2, new_money_1, -pay_amount])
+            cursor.execute("""INSERT INTO transactions( user_id,
+                                                            username,
+                                                            user_id2,
+                                                            username2,
+                                                            money,
+                                                            money_spent)
+                                                            VALUES (?,?,?,?,?,?)""",
+                                [user_id2, username2, user_id1, username1, new_money_2, +pay_amount])
             con.commit()
             #con.close()
-
         except Exception as error:
             print(f"Error : {error}")
             print("Transaction failed !!")
@@ -140,7 +153,7 @@ def create_transaction_table():
                         username2   TEXT NOT NULL,
                         money       INT NOT NULL,
                         money_spent INT NOT NULL,
-                        transaction_date TEXT DEFAULT CURRENT_TIMESTAMP,
+                        transaction_date TEXT DEFAULT CURRENT_TIMESTAMP
                         )""")
         con.commit()
         #con.close()
