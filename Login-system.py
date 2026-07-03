@@ -1,6 +1,25 @@
 import sqlite_data as sql
 import time
 
+"""
+To do list:
+faster account loading:
+    instead of loading all of the accounts, load a specific one 
+    using the id and check the db and then load it into here.
+
+get transactions for the user:
+    the function exist just add it in login system.
+    
+deleting accounts:
+    add a way for users to deleting accounts.
+
+a way for the user to unlock accounts:
+    self explanatory. 
+
+password hashing:
+    maybe not rn but would be nice. 
+"""
+
 timing1 = 0.35
 
 def slow_print(text,timing):
@@ -87,7 +106,8 @@ class Account:
         print(f"Your balance : {money}")
 
     def deposit_withdraw(self):
-        self.login_check()
+        if not self.login_check():
+            return
         print("What do you wanna do ? Withdraw / Deposit ")
         choice = input("W/D : ")
         choice = choice.lower()
@@ -126,28 +146,29 @@ class Account:
         return self
 
     def __enter__(self):
-        if self.locked:
-            pass
-            #return
-        if self.counter >= 3:
-            self.locked = True
-            print("You have ran out of tries.")
-            print("Your account is now locked.")
-            return self
-
-        print(" Enter username and password.")
-        iuser     = input("Username : ")
-        ipassword = input("Password : ")
-        if iuser == self.username and ipassword == self.password:
-            self.login = True
-            self.counter = 0
-            print("Login Successful")
-            return self
-        else:
-            print("Login Failed.")
-            print("Wrong username or password.")
-            self.counter += 1
-            return self
+        while True:
+            if self.locked:
+                print("Account is locked.")
+                return
+            if self.counter >= 3:
+                self.locked = True
+                sql.change_lock_state(self.user_id,self.locked)
+                print("You have ran out of tries.")
+                print("Your account is now locked.")
+                return self
+            print(" Enter username and password.")
+            iuser     = input("Username : ")
+            ipassword = input("Password : ")
+            if iuser == self.username and ipassword == self.password:
+                self.login = True
+                self.counter = 0
+                print("Login Successful")
+                return self
+            else:
+                print("Login Failed.")
+                print("Wrong username or password.")
+                self.counter += 1
+                #return self
 
     def __exit__(self,exc_type, exc_value, traceback):
         self.login = False
@@ -162,11 +183,13 @@ class Account:
 #sql.delete_data_accounts(6)
 sql.create_table_accounts()
 sql.create_transaction_table()
-sql.insert_data_accounts("leon",1234)
+sql.insert_data_accounts("bob",1234)
 account_dict = load_accounts()
 list_accounts()
 sql.display()
 
 
-with account_dict[1] as account:
+with account_dict[2] as account:
+    #account.deposit_withdraw()
+    #account.payment_process(account_dict[1],500)
     pass
