@@ -108,6 +108,13 @@ class Account:
             print(f"Error : {error}")
             print("Money amount was not a number")
             return
+        if money_amount <= 0:
+            if money_amount == 0:
+                print("Money amount is 0$ ")
+                return
+            elif money_amount < 0:
+                print("Money amount can't be negative")
+                return
         if choice == "withdraw":
             self.update_stored_data_money()
             if not self.check_payment(money_amount):
