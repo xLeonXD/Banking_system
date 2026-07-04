@@ -153,12 +153,12 @@ class Account:
             return
         transaction_tuple = sql.get_transactions(self.user_id,100)
         for i in transaction_tuple:
-            user_id,name,user_id2,name2,money,money_difference,date = i
+            user_id,name,user_id2,name2,money,money_difference,date,transaction_type,index = i
             #print(i)
             print(f"""
-                    ID : {user_id} - Name : {name} | To/From ID : {user_id2} - Name : {name2}
+                    ID : {user_id} - Name : {name} | {transaction_type} ID : {user_id2} - Name : {name2}
                     Balance : {money} - Money exchanged amount : {money_difference} 
-                    Date : {date}
+                    Date : {date}   - Index : {index}
             """)
 
     def __enter__(self):
@@ -206,8 +206,8 @@ sql.display()
 
 
 with account_dict[2] as account:
-    account.transaction_list()
     #account.deposit_withdraw()
+    account.transaction_list()
     """account.payment_process(account_dict[1],1)
     account.payment_process(account_dict[1], 20)
     account.payment_process(account_dict[1], 100)
