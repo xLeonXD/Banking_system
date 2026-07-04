@@ -3,6 +3,9 @@ import time
 
 """
 To do list:
+account creation:
+    add a func to add accounts.
+
 faster account loading:
     instead of loading all of the accounts, load a specific one 
     using the id and check the db and then load it into here.
@@ -145,6 +148,13 @@ class Account:
         self.update_stored_data_money()
         return self
 
+    def transaction_list(self):
+        if not self.login_check():
+            return
+        transaction_tuple = sql.get_transactions(self.user_id,)
+        for i in transaction_tuple:
+            print(i)
+
     def __enter__(self):
         while True:
             if self.locked:
@@ -190,6 +200,21 @@ sql.display()
 
 
 with account_dict[2] as account:
+    account.transaction_list()
     #account.deposit_withdraw()
-    #account.payment_process(account_dict[1],500)
+    """account.payment_process(account_dict[1],1)
+    account.payment_process(account_dict[1], 20)
+    account.payment_process(account_dict[1], 100)
+    account.payment_process(account_dict[1], 0)
+    account.payment_process(account_dict[1], 1)
+    account.payment_process(account_dict[1], 2)
+    account.payment_process(account_dict[1], 3)
+    account.payment_process(account_dict[1], 4)
+    account.payment_process(account_dict[1], 5)
+    account.payment_process(account_dict[1], 6)
+    account.payment_process(account_dict[1], 7)
+    account.payment_process(account_dict[1], 8)
+    account.payment_process(account_dict[1], 9)
+    account.payment_process(account_dict[1], 10)"""
+
     pass
