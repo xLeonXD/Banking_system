@@ -79,7 +79,7 @@ def change_money(user_id,exchange_money,username):
                                                             money_spent,
                                                             type)
                                                             VALUES (?,?,?,?,?,?,?) """,
-                           [user_id,username,user_id,username,money,exchange_money,transaction_type])
+                           [user_id,username,user_id,username,new_money,exchange_money,transaction_type])
             con.commit()
             #con.close()
         except Exception as error:
@@ -170,7 +170,7 @@ def create_transaction_table():
                         money_spent         INT NOT NULL,
                         transaction_date    TEXT DEFAULT CURRENT_TIMESTAMP,
                         type                TEXT NOT  NULL,
-                        transaction_index   INT AUTOINCREMENT
+                        transaction_index   INTEGER PRIMARY KEY AUTOINCREMENT
                         )""")
         con.commit()
         #con.close()
@@ -221,7 +221,4 @@ def get_transactions(user_id,amount=10):
         cursor.execute("SELECT * FROM transactions WHERE user_id = ? ORDER BY transaction_index DESC",[user_id])
         transaction_tuple = cursor.fetchmany(amount)
         return transaction_tuple
-
-#insert_data_accounts("leon2","1234")
-#display()
 
