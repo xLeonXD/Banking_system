@@ -52,10 +52,13 @@ def list_accounts_cached(account_dict):
     for i in account_dict:
         print(account_dict[i])
 
-def create_account(usr,pas):
+def create_account(usr,pas,account_dict=None):
     sql.insert_data_accounts(usr,pas)
-    account_dict = load_accounts()
-    return account_dict
+    user_id = sql.get_id(usr)
+    if account_dict is None:
+        account_dict = {}
+    account_dict = load_specific_account(account_dict,user_id)
+    return account_dict,user_id
 
 def load_specific_account(account_dict,user_id):
     item = sql.get_one_account(user_id)
@@ -217,20 +220,20 @@ class Account:
 #sql.delete_data_accounts(6)
 sql.create_table_accounts()
 sql.create_transaction_table()
-create_account("bomb","lego")
+"""create_account("bomb","lego")
 account_dict = load_specific_account(account_dict,3)
 print(account_dict)
 #account_dict = load_accounts()
-#list_all_accounts()
+#list_all_accounts()"""
 sql.display()
 
 
-with account_dict[2] as account:
+"""with account_dict[2] as account:
     #account.deposit_withdraw()
 
     account.payment_process(account_dict[2],200)
     account.transaction_list()
-    """account.payment_process(account_dict[1],1)
+    account.payment_process(account_dict[1],1)
     account.payment_process(account_dict[1], 20)
     account.payment_process(account_dict[1], 100)
     account.payment_process(account_dict[1], 0)
@@ -243,6 +246,46 @@ with account_dict[2] as account:
     account.payment_process(account_dict[1], 7)
     account.payment_process(account_dict[1], 8)
     account.payment_process(account_dict[1], 9)
-    account.payment_process(account_dict[1], 10)"""
+    account.payment_process(account_dict[1], 10)
 
-    pass
+    pass"""
+
+choice = ["1","2","3","4"]
+while True:
+    print("What do you wanna do ? ")
+    print("""    1 ) Log into bank account
+    2 ) Create Account
+    3 ) Get ID
+    4 ) Exit
+    """)
+    ichoice = input(" ? : ")
+    if not ichoice in choice:
+        print("Wrong choice.")
+        continue
+    if ichoice == "1":
+        ichocie = "login"
+
+    elif ichoice == "2":
+        ichocie = "create"
+        print("Please type in an username.")
+        username = input("username : ")
+        print("Please type in a password.")
+        password = input("password : ")
+        account_dict,user_id = create_account(username,password)
+        print(f"your ID is : {user_id}")
+
+    elif ichoice == "3":
+        ichoice = "ID"
+        print("Please type in the username")
+        username = input(f"username : ")
+        id = sql.get_id(username)
+        if id is None:
+            print("ID not found")
+            continue
+        print(f"{username}'s ID is {id}")
+
+    elif ichoice == "4":
+        print("Exiting",end="")
+        slow_print("...",timing1)
+        exit()
+
