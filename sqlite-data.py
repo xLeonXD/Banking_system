@@ -215,6 +215,13 @@ def get_accounts():
         #con.close()
         return items
 
+def get_one_account(user_id):
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("SELECT * FROM accounts WHERE user_id = ?",[user_id])
+        item = cursor.fetchone()
+        return item
+
 def get_transactions(user_id,amount=10):
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
@@ -222,3 +229,5 @@ def get_transactions(user_id,amount=10):
         transaction_tuple = cursor.fetchmany(amount)
         return transaction_tuple
 
+#pay_transaction(2,1,100,"bob","leon")
+print(get_transactions(2,))
