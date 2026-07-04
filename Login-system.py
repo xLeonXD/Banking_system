@@ -151,9 +151,15 @@ class Account:
     def transaction_list(self):
         if not self.login_check():
             return
-        transaction_tuple = sql.get_transactions(self.user_id,)
+        transaction_tuple = sql.get_transactions(self.user_id,100)
         for i in transaction_tuple:
-            print(i)
+            user_id,name,user_id2,name2,money,money_difference,date = i
+            #print(i)
+            print(f"""
+                    ID : {user_id} - Name : {name} | To/From ID : {user_id2} - Name : {name2}
+                    Balance : {money} - Money exchanged amount : {money_difference} 
+                    Date : {date}
+            """)
 
     def __enter__(self):
         while True:
