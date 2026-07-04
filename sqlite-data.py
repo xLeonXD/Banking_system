@@ -56,7 +56,7 @@ def get_money(user_id):
         #con.close()
         return money
 
-def change_money(user_id,exchange_money):
+def change_money(user_id,exchange_money,username):
     #import sqlite3
     #con = sqlite3.connect("accounts.db")
     with sqlite3.connect("accounts.db") as con:
@@ -64,9 +64,22 @@ def change_money(user_id,exchange_money):
         cursor.execute("SELECT money FROM accounts WHERE user_id = ?",[user_id])
         money_tuple = cursor.fetchone()
         money = money_tuple[0]
+        if exchange_money < 0:
+            transaction_type = "Withdraw"
+        else:
+            transaction_type = "Deposit"
         new_money = money + exchange_money
         try:
             cursor.execute("UPDATE accounts SET money = ? WHERE user_id = ?",[new_money,user_id])
+            cursor.execute("""INSERT INTO transactions    ( user_id,
+                                                            username,
+                                                            user_id2,
+                                                            username2,
+                                                            money,
+                                                            money_spent,
+                                                            type)
+                                                            VALUES (?,?,?,?,?,?,?) """,
+                           [user_id,username,user_id,username,money,exchange_money,transaction_type])
             con.commit()
             #con.close()
         except Exception as error:
@@ -157,7 +170,7 @@ def create_transaction_table():
                         money_spent         INT NOT NULL,
                         transaction_date    TEXT DEFAULT CURRENT_TIMESTAMP,
                         type                TEXT NOT  NULL,
-                        transaction_num     INT AUTOINCREMENT
+                        transaction_index   INT AUTOINCREMENT
                         )""")
         con.commit()
         #con.close()
@@ -205,7 +218,7 @@ def get_accounts():
 def get_transactions(user_id,amount=10):
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
-        cursor.execute("SELECT * FROM transactions WHERE user_id = ? ORDER BY transaction_num DESC",[user_id])
+        cursor.execute("SELECT * FROM transactions WHERE user_id = ? ORDER BY transaction_index DESC",[user_id])
         transaction_tuple = cursor.fetchmany(amount)
         return transaction_tuple
 
