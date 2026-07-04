@@ -3,17 +3,17 @@ import time
 
 """
 To do list:
-account creation:
+account creation: - DONE -
     add a func to add accounts.
 
-faster account loading:
+faster account loading: - DONE -
     instead of loading all of the accounts, load a specific one 
     using the id and check the db and then load it into here.
 
 get transactions for the user: - DONE -
     the function exist just add it in login system.
     
-deleting accounts:
+deleting accounts: 
     add a way for users to deleting accounts.
 
 a way for the user to unlock accounts:
@@ -24,6 +24,7 @@ password hashing:
 """
 
 timing1 = 0.35
+account_dict = {}
 
 def slow_print(text,timing):
     for i in text:
@@ -32,24 +33,38 @@ def slow_print(text,timing):
     else:
         print("")
 
-def load_accounts():
+def load_accounts(account_dict=None):
+    if account_dict is None:
+        account_dict = {}
     items = sql.get_accounts()
-    account_dict = {}
+    #account_dict = {}
     for user_id,username,password,temp,temp2,lock_state in items:
         account_dict[user_id] = Account(user_id,username,password,lock_state)
     return account_dict
 
-def list_accounts():
+def list_all_accounts():
     account_dict = load_accounts()
+    for i in account_dict:
+        print(account_dict[i])
+
+def list_accounts_cached(account_dict):
+    #account_dict = load_accounts(account_dict)
     for i in account_dict:
         print(account_dict[i])
 
 def create_account(usr,pas):
     sql.insert_data_accounts(usr,pas)
     account_dict = load_accounts()
-
     return account_dict
 
+def load_specific_account(account_dict,user_id):
+    item = sql.get_one_account(user_id)
+    if item is None:
+        print("Account not found.")
+        return account_dict
+    user_id,username,password,temp,temp2,lock_state = item
+    account_dict[user_id] = Account(user_id,username,password,lock_state)
+    return account_dict
 
 class Account:
     def __init__(self,user_id,username,password,lock_state):
@@ -203,8 +218,10 @@ class Account:
 sql.create_table_accounts()
 sql.create_transaction_table()
 create_account("bomb","lego")
-account_dict = load_accounts()
-list_accounts()
+account_dict = load_specific_account(account_dict,3)
+print(account_dict)
+#account_dict = load_accounts()
+#list_all_accounts()
 sql.display()
 
 
