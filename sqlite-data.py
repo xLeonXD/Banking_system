@@ -122,16 +122,18 @@ def pay_transaction(user_id1,user_id2,pay_amount,username1,username2):
                                                             user_id2,
                                                             username2,
                                                             money,
-                                                            money_spent)
-                                                            VALUES (?,?,?,?,?,?)""",
+                                                            money_spent,
+                                                            type)
+                                                            VALUES (?,?,?,?,?,?,'To')""",
                             [user_id1, username1, user_id2, username2, new_money_1, -pay_amount])
             cursor.execute("""INSERT INTO transactions( user_id,
                                                             username,
                                                             user_id2,
                                                             username2,
                                                             money,
-                                                            money_spent)
-                                                            VALUES (?,?,?,?,?,?)""",
+                                                            money_spent,
+                                                            type)
+                                                            VALUES (?,?,?,?,?,?,'From')""",
                                 [user_id2, username2, user_id1, username1, new_money_2, +pay_amount])
             con.commit()
             #con.close()
@@ -147,13 +149,15 @@ def create_transaction_table():
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
         cursor.execute("""CREATE TABLE IF NOT EXISTS transactions( 
-                        user_id     INT NOT NULL,
-                        username    TEXT NOT NULL,           
-                        user_id2    INT NOT NULL,
-                        username2   TEXT NOT NULL,
-                        money       INT NOT NULL,
-                        money_spent INT NOT NULL,
-                        transaction_date TEXT DEFAULT CURRENT_TIMESTAMP
+                        user_id             INT NOT NULL,
+                        username            TEXT NOT NULL,           
+                        user_id2            INT NOT NULL,
+                        username2           TEXT NOT NULL,
+                        money               INT NOT NULL,
+                        money_spent         INT NOT NULL,
+                        transaction_date    TEXT DEFAULT CURRENT_TIMESTAMP,
+                        type                TEXT NOT  NULL,
+                        transaction_num     INT AUTOINCREMENT
                         )""")
         con.commit()
         #con.close()
@@ -164,12 +168,12 @@ def create_table_accounts():
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
         cursor.execute("""CREATE TABLE IF NOT EXISTS accounts(
-                       user_id  INTEGER PRIMARY KEY AUTOINCREMENT,
-                       username TEXT NOT NULL UNIQUE,
-                       password TEXT NOT NULL,
-                       money    INT NOT NULL,
-                       account_created_time TEXT DEFAULT CURRENT_TIMESTAMP,
-                       lock_state BOOL DEFAULT FALSE
+                       user_id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+                       username                 TEXT NOT NULL UNIQUE,
+                       password                 TEXT NOT NULL,
+                       money                    INT NOT NULL,
+                       account_created_time     TEXT DEFAULT CURRENT_TIMESTAMP,
+                       lock_state               BOOL DEFAULT FALSE
                        )""")
         con.commit()
         #con.close()
@@ -201,7 +205,7 @@ def get_accounts():
 def get_transactions(user_id,amount=10):
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
-        cursor.execute("SELECT * FROM transactions WHERE user_id = ? ORDER BY transaction_date DESC",[user_id])
+        cursor.execute("SELECT * FROM transactions WHERE user_id = ? ORDER BY transaction_num DESC",[user_id])
         transaction_tuple = cursor.fetchmany(amount)
         return transaction_tuple
 
