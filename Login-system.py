@@ -144,7 +144,7 @@ class Account:
                 print("Not enough money.")
                 return
         money_amount *= amount_type
-        sql.change_money(self.user_id,money_amount)
+        sql.change_money(self.user_id,money_amount,self.username)
         self.update_stored_data_money()
         return self
 
