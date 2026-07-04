@@ -10,7 +10,7 @@ faster account loading:
     instead of loading all of the accounts, load a specific one 
     using the id and check the db and then load it into here.
 
-get transactions for the user:
+get transactions for the user: - DONE -
     the function exist just add it in login system.
     
 deleting accounts:
@@ -85,6 +85,9 @@ class Account:
         sql.pay_transaction(self.user_id,other.user_id,pay_amount,self.username,other.username)
 
     def payment_process(self,other,pay_amount):
+        if self.user_id == other.user_id:
+            print("You cannot pay yourself.")
+            return self
         self.update_stored_data_money()
         if not self.check_payment(pay_amount):
             print("Not enough money !!")
@@ -199,7 +202,7 @@ class Account:
 #sql.delete_data_accounts(6)
 sql.create_table_accounts()
 sql.create_transaction_table()
-sql.insert_data_accounts("bob",1234)
+create_account("bomb","lego")
 account_dict = load_accounts()
 list_accounts()
 sql.display()
@@ -207,6 +210,8 @@ sql.display()
 
 with account_dict[2] as account:
     #account.deposit_withdraw()
+
+    account.payment_process(account_dict[2],200)
     account.transaction_list()
     """account.payment_process(account_dict[1],1)
     account.payment_process(account_dict[1], 20)
