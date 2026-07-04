@@ -222,6 +222,15 @@ def get_one_account(user_id):
         item = cursor.fetchone()
         return item
 
+def get_id(username):
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("SELECT user_id FROM accounts WHERE username = ? ",[username])
+        item = cursor.fetchone()
+        if item is None:
+            return None
+        return item[0]
+    
 def get_transactions(user_id,amount=10):
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
@@ -230,4 +239,4 @@ def get_transactions(user_id,amount=10):
         return transaction_tuple
 
 #pay_transaction(2,1,100,"bob","leon")
-print(get_transactions(2,))
+#print(get_transactions(2,))
