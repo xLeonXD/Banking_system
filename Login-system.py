@@ -57,16 +57,21 @@ def create_account(usr,pas,account_dict=None):
     user_id = sql.get_id(usr)
     if account_dict is None:
         account_dict = {}
-    account_dict = load_specific_account(account_dict,user_id)
+    account_dict,_ = load_specific_account(account_dict,user_id)
     return account_dict,user_id
 
 def load_specific_account(account_dict,user_id):
+    if user_id in account_dict:
+        print("Found")
+        return account_dict,True
     item = sql.get_one_account(user_id)
     if item is None:
         print("Account not found.")
         return account_dict,False
-    user_id,username,password,temp,temp2,lock_state = item
-    account_dict[user_id] = Account(user_id,username,password,lock_state)
+    print(f"item : {item}")
+    _,username,password,temp,temp2,lock_state = item
+    print(f"_ : {_}")
+    account_dict[_] = Account(user_id,username,password,lock_state)
     return account_dict,True
 
 class Account:
@@ -250,14 +255,15 @@ sql.display()
 
     pass"""
 
-choice = ["1","2","3","4","login","log into bank account","create account","get id","exit"]
+choice = ["1","2","3","4","5","login","log into bank account","create account","get id","exit"]
 choice2 = ["1","2","3","4","5","6"]
 while True:
     print("What do you wanna do ? ")
     print("""    1 ) Log into bank account
     2 ) Create Account
     3 ) Get ID
-    4 ) Exit
+    4 ) Unlock Account
+    5 ) Exit
     """)
     ichoice = input(" ? : ")
     if not ichoice in choice:
@@ -291,7 +297,10 @@ while True:
         time.sleep(1)
         continue
 
-    elif ichoice == "4" or ichoice == "exit":
+    elif ichoice == "4":
+        pass
+
+    elif ichoice == "5" or ichoice == "exit":
         print("Exiting",end="")
         slow_print("...",timing1)
         exit()
@@ -309,6 +318,8 @@ while True:
         time.sleep(0.35)
         continue
     with account_dict[id] as account:
+        if not account.login_check():
+            continue
         action = True
         while action:
             print("What do you wanna do ?")
@@ -349,6 +360,7 @@ while True:
                 except ValueError:
                     print("Pay amount must be a number")
                     time.sleep(0.35)
+                    continue
                 account.payment_process(account_dict[id2],amount)
                 time.sleep(1)
                 continue
