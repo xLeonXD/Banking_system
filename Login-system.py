@@ -76,14 +76,14 @@ def load_specific_account(account_dict,user_id):
 
 def unlock(account_dict):
     print("insert ID")
-    id = input("ID : ")
+    user_id = input("ID : ")
     try:
-        id = int(id)
+        user_id = int(user_id)
     except ValueError:
         print("ID must be a number")
         time.sleep(0.35)
         return
-    account_dict,proceed = load_specific_account(account_dict,id)
+    account_dict,proceed = load_specific_account(account_dict,user_id)
     if not proceed:
         print("ID not found")
         return account_dict
@@ -334,8 +334,8 @@ while True:
     elif ichoice == "4":
         account_dict =unlock(account_dict)
         time.sleep(1)
-        continue 
-        
+        continue
+
     elif ichoice == "5" or ichoice == "exit":
         print("Exiting",end="")
         slow_print("...",timing1)
@@ -413,11 +413,9 @@ while True:
 
             elif ichoice2 == "5":
                 ichoice = "delete"
-                #action = False
                 if account.delete_account():
                     action = False
                     break
-
 
             elif ichoice2 == "6":
                 action = False
