@@ -251,6 +251,7 @@ sql.display()
     pass"""
 
 choice = ["1","2","3","4","login","log into bank account","create account","get id","exit"]
+choice2 = ["1","2","3","4","5","6"]
 while True:
     print("What do you wanna do ? ")
     print("""    1 ) Log into bank account
@@ -318,4 +319,53 @@ while True:
     5) Delete account
     6) Log out
              """)
-            break
+            ichoice2 = input("? : ")
+            if not ichoice2 in choice2:
+                print("Wrong choice.")
+                time.sleep(0.35)
+                continue
+            if ichoice2 == "1":
+                ichoice2 = "Withdraw_Deposit"
+                account.deposit_withdraw()
+
+            elif ichoice2 == "2":
+                ichoice2 = "Pay"
+                print("Please type in the ID of the person you want to pay.")
+                id2 = input("ID : ")
+                try:
+                    id2 = int(id2)
+                except ValueError:
+                    print("ID must be a number")
+                    time.sleep(0.35)
+                    continue
+                account_dict, proceed = load_specific_account(account_dict, id2)
+                if not proceed:
+                    time.sleep(0.35)
+                    continue
+                print("How much ?")
+                amount = input(" $ : ")
+                try:
+                    amount = int(amount)
+                except ValueError:
+                    print("Pay amount must be a number")
+                    time.sleep(0.35)
+                account.payment_process(account_dict[id2],amount)
+                time.sleep(1)
+                continue
+
+            elif ichoice2 == "3":
+                account.check_money()
+                time.sleep(1)
+                continue
+
+            elif ichoice2 == "4":
+                account.transaction_list()
+                time.sleep(1)
+                continue
+
+            elif ichoice2 == "5":
+                pass
+
+            elif ichoice2 == "6":
+                action = False
+                break
