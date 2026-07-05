@@ -13,7 +13,7 @@ faster account loading: - DONE -
 get transactions for the user: - DONE -
     the function exist just add it in login system.
     
-deleting accounts: 
+deleting accounts: - DONE -
     add a way for users to deleting accounts.
 
 a way for the user to unlock accounts:
@@ -108,6 +108,8 @@ class Account:
         sql.pay_transaction(self.user_id,other.user_id,pay_amount,self.username,other.username)
 
     def payment_process(self,other,pay_amount):
+        if not self.login_check():
+            return
         if self.user_id == other.user_id:
             print("You cannot pay yourself.")
             return self
@@ -186,6 +188,21 @@ class Account:
                     Balance : {money} - Money exchanged amount : {money_difference} 
                     Date : {date}   - Index : {index}
             """)
+
+    def delete_account(self):
+        if not self.login_check():
+            return
+        print("Are you sure you want to close your account ?")
+        ans = input("Y/n : ")
+        if ans == "y" or ans == "yes":
+            sql.delete_data_accounts(self.user_id)
+            self.login = False
+            print("Account closed.")
+            #self.__exit__(None, None, None)
+            return True
+        else:
+            print("Account deletion canceled.")
+            return False
 
     def __enter__(self):
         while True:
@@ -376,7 +393,12 @@ while True:
                 continue
 
             elif ichoice2 == "5":
-                pass
+                ichoice = "delete"
+                #action = False
+                if account.delete_account():
+                    action = False
+                    break
+
 
             elif ichoice2 == "6":
                 action = False
