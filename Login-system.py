@@ -16,7 +16,7 @@ get transactions for the user: - DONE -
 deleting accounts: - DONE -
     add a way for users to deleting accounts.
 
-a way for the user to unlock accounts:
+a way for the user to unlock accounts: - DONE -
     self explanatory. 
 
 password hashing:
@@ -73,6 +73,23 @@ def load_specific_account(account_dict,user_id):
     print(f"_ : {_}")
     account_dict[_] = Account(user_id,username,password,lock_state)
     return account_dict,True
+
+def unlock(account_dict):
+    print("insert ID")
+    id = input("ID : ")
+    try:
+        id = int(id)
+    except ValueError:
+        print("ID must be a number")
+        time.sleep(0.35)
+        return
+    account_dict,proceed = load_specific_account(account_dict,id)
+    if not proceed:
+        print("ID not found")
+        return account_dict
+    account_dict[id].locked = False
+    sql.change_lock_state(id,False)
+    return account_dict
 
 class Account:
     def __init__(self,user_id,username,password,lock_state):
@@ -315,8 +332,10 @@ while True:
         continue
 
     elif ichoice == "4":
-        pass
-
+        account_dict =unlock(account_dict)
+        time.sleep(1)
+        continue 
+        
     elif ichoice == "5" or ichoice == "exit":
         print("Exiting",end="")
         slow_print("...",timing1)
