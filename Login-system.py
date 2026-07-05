@@ -64,10 +64,10 @@ def load_specific_account(account_dict,user_id):
     item = sql.get_one_account(user_id)
     if item is None:
         print("Account not found.")
-        return account_dict
+        return account_dict,False
     user_id,username,password,temp,temp2,lock_state = item
     account_dict[user_id] = Account(user_id,username,password,lock_state)
-    return account_dict
+    return account_dict,True
 
 class Account:
     def __init__(self,user_id,username,password,lock_state):
@@ -250,7 +250,7 @@ sql.display()
 
     pass"""
 
-choice = ["1","2","3","4"]
+choice = ["1","2","3","4","login","log into bank account","create account","get id","exit"]
 while True:
     print("What do you wanna do ? ")
     print("""    1 ) Log into bank account
@@ -261,11 +261,13 @@ while True:
     ichoice = input(" ? : ")
     if not ichoice in choice:
         print("Wrong choice.")
+        time.sleep(0.35)
         continue
-    if ichoice == "1":
+
+    if ichoice == "1" or ichoice == "login" or ichoice == "log into bank account":
         ichocie = "login"
 
-    elif ichoice == "2":
+    elif ichoice == "2" or ichoice == "create account":
         ichocie = "create"
         print("Please type in an username.")
         username = input("username : ")
@@ -273,8 +275,10 @@ while True:
         password = input("password : ")
         account_dict,user_id = create_account(username,password)
         print(f"your ID is : {user_id}")
+        time.sleep(1)
+        continue
 
-    elif ichoice == "3":
+    elif ichoice == "3" or ichoice == "get id":
         ichoice = "ID"
         print("Please type in the username")
         username = input(f"username : ")
@@ -283,9 +287,35 @@ while True:
             print("ID not found")
             continue
         print(f"{username}'s ID is {id}")
+        time.sleep(1)
+        continue
 
-    elif ichoice == "4":
+    elif ichoice == "4" or ichoice == "exit":
         print("Exiting",end="")
         slow_print("...",timing1)
         exit()
 
+    print("Please enter your ID")
+    id = input("ID : ")
+    try:
+        id = int(id)
+    except ValueError:
+        print("ID must be a number")
+        time.sleep(0.35)
+        continue
+    account_dict,proceed = load_specific_account(account_dict,id)
+    if not proceed:
+        time.sleep(0.35)
+        continue
+    with account_dict[id] as account:
+        action = True
+        while action:
+            print("What do you wanna do ?")
+            print("""    1) Withdraw / Deposit
+    2) Pay 
+    3) Check balance
+    4) Get transaction list
+    5) Delete account
+    6) Log out
+             """)
+            break
