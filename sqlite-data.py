@@ -230,7 +230,14 @@ def get_id(username):
         if item is None:
             return None
         return item[0]
-    
+
+def get_date(user_id):
+    with sqlite3.connect("accounts.db") as con:
+        cursor = con.cursor()
+        cursor.execute("SELECT account_created_time FROM accounts WHERE user_id = ?",[user_id])
+        item = cursor.fetchone()
+        return item[0]
+
 def get_transactions(user_id,amount=10):
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
