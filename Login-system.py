@@ -87,8 +87,8 @@ def unlock(account_dict):
     if not proceed:
         print("ID not found")
         return account_dict
-    account_dict[id].locked = False
-    sql.change_lock_state(id,False)
+    account_dict[user_id].locked = False
+    sql.change_lock_state(user_id,False)
     return account_dict
 
 class Account:
@@ -221,6 +221,16 @@ class Account:
             print("Account deletion canceled.")
             return False
 
+    def check_person(self):
+        if not self.login_check():
+            return
+        self.update_stored_data_money()
+        date = sql.get_date(self.user_id)
+        print(f"""
+                ID : {self.user_id}  ---  Name : {self.username} --- Balance : {self.money}                                                                                 
+                Account creation date : {date}                                                                                                                                                                  
+        """)
+
     def __enter__(self):
         while True:
             if self.locked:
@@ -290,7 +300,7 @@ sql.display()
     pass"""
 
 choice = ["1","2","3","4","5","login","log into bank account","create account","get id","exit"]
-choice2 = ["1","2","3","4","5","6"]
+choice2 = ["1","2","3","4","5","6","7"]
 while True:
     print("What do you wanna do ? ")
     print("""    1 ) Log into bank account
@@ -323,16 +333,16 @@ while True:
         ichoice = "ID"
         print("Please type in the username")
         username = input(f"username : ")
-        id = sql.get_id(username)
-        if id is None:
+        user_id = sql.get_id(username)
+        if user_id is None:
             print("ID not found")
             continue
-        print(f"{username}'s ID is {id}")
+        print(f"{username}'s ID is {user_id}")
         time.sleep(1)
         continue
 
     elif ichoice == "4":
-        account_dict =unlock(account_dict)
+        account_dict = unlock(account_dict)
         time.sleep(1)
         continue
 
@@ -342,18 +352,18 @@ while True:
         exit()
 
     print("Please enter your ID")
-    id = input("ID : ")
+    user_id = input("ID : ")
     try:
-        id = int(id)
+        user_id = int(user_id)
     except ValueError:
         print("ID must be a number")
         time.sleep(0.35)
         continue
-    account_dict,proceed = load_specific_account(account_dict,id)
+    account_dict,proceed = load_specific_account(account_dict,user_id)
     if not proceed:
         time.sleep(0.35)
         continue
-    with account_dict[id] as account:
+    with account_dict[user_id] as account:
         if not account.login_check():
             continue
         action = True
@@ -362,9 +372,10 @@ while True:
             print("""    1) Withdraw / Deposit
     2) Pay 
     3) Check balance
-    4) Get transaction list
-    5) Delete account
-    6) Log out
+    4) Check profile
+    5) Get transaction list
+    6) Delete account
+    7) Log out
              """)
             ichoice2 = input("? : ")
             if not ichoice2 in choice2:
@@ -407,16 +418,21 @@ while True:
                 continue
 
             elif ichoice2 == "4":
-                account.transaction_list()
+                account.check_person()
                 time.sleep(1)
                 continue
 
             elif ichoice2 == "5":
+                account.transaction_list()
+                time.sleep(1)
+                continue
+
+            elif ichoice2 == "6":
                 ichoice = "delete"
                 if account.delete_account():
                     action = False
                     break
 
-            elif ichoice2 == "6":
+            elif ichoice2 == "7":
                 action = False
                 break
