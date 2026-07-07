@@ -56,7 +56,7 @@ def list_accounts_cached(account_dict):
 def hashing(pas):
     byte = pas.encode("utf-8")
     salt = bcrypt.gensalt()
-    hash = (byte,salt)
+    hash = bcrypt.hashpw(byte,salt)
     return hash
 
 def create_byte(pas):
