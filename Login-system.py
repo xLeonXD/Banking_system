@@ -44,12 +44,13 @@ def create_byte(pas):
 
 def create_account(usr,pas,account_dict=None):
     hash_pas = hashing(pas)
-    sql.insert_data_accounts(usr,hash_pas)
     user_id = sql.get_id(usr)
     if account_dict is None:
         account_dict = {}
+    if not sql.insert_data_accounts(usr,hash_pas):
+        return account_dict,user_id,False
     account_dict,_ = load_specific_account(account_dict,user_id)
-    return account_dict,user_id
+    return account_dict,user_id,True
 
 def load_specific_account(account_dict,user_id):
     if user_id in account_dict:
@@ -269,16 +270,17 @@ while True:
         continue
 
     if ichoice == "1" or ichoice == "login" or ichoice == "log into bank account":
-        ichocie = "login"
+        ichoice = "login"
 
     elif ichoice == "2" or ichoice == "create account":
-        ichocie = "create"
+        ichoice = "create"
         print("Please type in an username.")
         username = input("username : ")
         print("Please type in a password.")
         password = input("password : ")
-        account_dict,user_id = create_account(username,password)
-        print(f"your ID is : {user_id}")
+        account_dict,user_id,give_user_id = create_account(username,password)
+        if give_user_id:
+            print(f"your ID is : {user_id}")
         time.sleep(1)
         continue
 
@@ -389,3 +391,4 @@ while True:
             elif ichoice2 == "7":
                 action = False
                 break
+
