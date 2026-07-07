@@ -1,5 +1,6 @@
 import sqlite_data as sql
 import time
+import bcrypt
 
 """
 To do list:
@@ -52,8 +53,19 @@ def list_accounts_cached(account_dict):
     for i in account_dict:
         print(account_dict[i])
 
+def hashing(pas):
+    byte = pas.encode("utf-8")
+    salt = bcrypt.gensalt()
+    hash = (byte,salt)
+    return hash
+
+def create_byte(pas):
+    byte = pas.encode("utf-8")
+    return byte
+
 def create_account(usr,pas,account_dict=None):
-    sql.insert_data_accounts(usr,pas)
+    hash_pas = hashing(pas)
+    sql.insert_data_accounts(usr,hash_pas)
     user_id = sql.get_id(usr)
     if account_dict is None:
         account_dict = {}
@@ -227,8 +239,8 @@ class Account:
         self.update_stored_data_money()
         date = sql.get_date(self.user_id)
         print(f"""
-                ID : {self.user_id}  ---  Name : {self.username} --- Balance : {self.money}                                                                                 
-                Account creation date : {date}                                                                                                                                                                  
+            ID : {self.user_id}  ---  Name : {self.username} --- Balance : {self.money}                                                                                 
+            Account creation date : {date}                                                                                                                                                                  
         """)
 
     def __enter__(self):
@@ -245,6 +257,8 @@ class Account:
             print(" Enter username and password.")
             iuser     = input("Username : ")
             ipassword = input("Password : ")
+            new_pas = create_byte(ipassword)
+            result = bcrypt.checkpw(new_pas,self.password)
             if iuser == self.username and ipassword == self.password:
                 self.login = True
                 self.counter = 0
