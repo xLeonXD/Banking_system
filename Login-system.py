@@ -259,7 +259,7 @@ class Account:
             ipassword = input("Password : ")
             new_pas = create_byte(ipassword)
             result = bcrypt.checkpw(new_pas,self.password)
-            if iuser == self.username and ipassword == self.password:
+            if iuser == self.username and result:
                 self.login = True
                 self.counter = 0
                 print("Login Successful")
