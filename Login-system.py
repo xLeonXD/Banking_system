@@ -44,21 +44,22 @@ def create_byte(pas):
 
 def create_account(usr,pas,account_dict=None):
     hash_pas = hashing(pas)
-    user_id = sql.get_id(usr)
     if account_dict is None:
         account_dict = {}
     if not sql.insert_data_accounts(usr,hash_pas):
+        user_id = sql.get_id(usr)
         return account_dict,user_id,False
+    user_id = sql.get_id(usr)
     account_dict,_ = load_specific_account(account_dict,user_id)
     return account_dict,user_id,True
 
 def load_specific_account(account_dict,user_id):
     if user_id in account_dict:
-        print("Found")
+        #print("Found")
         return account_dict,True
     item = sql.get_one_account(user_id)
     if item is None:
-        print("Account not found.")
+        #print("Account not found.")
         return account_dict,False
     _,username,password,temp,temp2,lock_state = item
     account_dict[_] = Account(user_id,username,password,lock_state)
