@@ -1,19 +1,17 @@
 import sqlite3
 
 def insert_data_accounts(usr,pas):
-    #import sqlite3
-    #con = sqlite3.connect("accounts.db")
     with sqlite3.connect("accounts.db") as con:
         cursor = con.cursor()
         try:
             cursor.execute("INSERT INTO accounts (username,password,money) VALUES (?,?,0)",[usr,pas])
             con.commit()
-            #con.close()
+            return True
         except Exception as error:
             print(f"Error : {error}")
             con.rollback()
             print("Something happened, rolling back!!")
-            #con.close()
+            return False
 
 def insert_data_transaction(user_id,username,user_id2,username2,money,money_spent):
     #import sqlite3
@@ -28,7 +26,6 @@ def insert_data_transaction(user_id,username,user_id2,username2,money,money_spen
             print(f"Error : {error}")
             con.rollback()
             #con.close()
-
 
 def delete_data_accounts(user_id):
     #import sqlite3
