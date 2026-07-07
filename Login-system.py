@@ -2,27 +2,6 @@ import sqlite_data as sql
 import time
 import bcrypt
 
-"""
-To do list:
-account creation: - DONE -
-    add a func to add accounts.
-
-faster account loading: - DONE -
-    instead of loading all of the accounts, load a specific one 
-    using the id and check the db and then load it into here.
-
-get transactions for the user: - DONE -
-    the function exist just add it in login system.
-    
-deleting accounts: - DONE -
-    add a way for users to deleting accounts.
-
-a way for the user to unlock accounts: - DONE -
-    self explanatory. 
-
-password hashing:
-    maybe not rn but would be nice. 
-"""
 
 timing1 = 0.35
 account_dict = {}
@@ -80,9 +59,7 @@ def load_specific_account(account_dict,user_id):
     if item is None:
         print("Account not found.")
         return account_dict,False
-    print(f"item : {item}")
     _,username,password,temp,temp2,lock_state = item
-    print(f"_ : {_}")
     account_dict[_] = Account(user_id,username,password,lock_state)
     return account_dict,True
 
@@ -103,6 +80,8 @@ def unlock(account_dict):
     sql.change_lock_state(user_id,False)
     return account_dict
 
+
+
 class Account:
     def __init__(self,user_id,username,password,lock_state):
         self.user_id  = user_id
@@ -112,8 +91,6 @@ class Account:
         self.login    = False
         self.locked   = lock_state
         self.money    = False
-        #self.pay_amount = False
-
 
     def login_check(self):
         if self.locked:
@@ -148,11 +125,6 @@ class Account:
             return self
         self.pay(other,pay_amount)
         return self
-
-    """def update_money_balance(self):
-        if not self.login_check():
-            return
-        pass"""
 
     def update_stored_data_money(self):
         money = sql.get_money(self.user_id)
@@ -227,7 +199,6 @@ class Account:
             sql.delete_data_accounts(self.user_id)
             self.login = False
             print("Account closed.")
-            #self.__exit__(None, None, None)
             return True
         else:
             print("Account deletion canceled.")
@@ -268,7 +239,6 @@ class Account:
                 print("Login Failed.")
                 print("Wrong username or password.")
                 self.counter += 1
-                #return self
 
     def __exit__(self,exc_type, exc_value, traceback):
         self.login = False
@@ -279,39 +249,8 @@ class Account:
     def __str__(self):
         return f"{self.user_id} : {self.username}"
 
-#sql.delete_data_accounts(5)
-#sql.delete_data_accounts(6)
 sql.create_table_accounts()
 sql.create_transaction_table()
-"""create_account("bomb","lego")
-account_dict = load_specific_account(account_dict,3)
-print(account_dict)
-#account_dict = load_accounts()
-#list_all_accounts()"""
-sql.display()
-
-
-"""with account_dict[2] as account:
-    #account.deposit_withdraw()
-
-    account.payment_process(account_dict[2],200)
-    account.transaction_list()
-    account.payment_process(account_dict[1],1)
-    account.payment_process(account_dict[1], 20)
-    account.payment_process(account_dict[1], 100)
-    account.payment_process(account_dict[1], 0)
-    account.payment_process(account_dict[1], 1)
-    account.payment_process(account_dict[1], 2)
-    account.payment_process(account_dict[1], 3)
-    account.payment_process(account_dict[1], 4)
-    account.payment_process(account_dict[1], 5)
-    account.payment_process(account_dict[1], 6)
-    account.payment_process(account_dict[1], 7)
-    account.payment_process(account_dict[1], 8)
-    account.payment_process(account_dict[1], 9)
-    account.payment_process(account_dict[1], 10)
-
-    pass"""
 
 choice = ["1","2","3","4","5","login","log into bank account","create account","get id","exit"]
 choice2 = ["1","2","3","4","5","6","7"]
